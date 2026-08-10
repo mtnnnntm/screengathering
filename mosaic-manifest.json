@@ -1,0 +1,49 @@
+{
+  "images": {
+    "moon": {
+      "type": "image",
+      "url": "moooon.jpg",
+      "layout": "horizontal"
+    },
+    "cat": {
+      "type": "image",
+      "url": "caaat.jpg",
+      "layout": "vertical"
+    },
+    "dinosaur": {
+      "type": "image",
+      "url": "dinosaur.png",
+      "layout": "horizontal"
+    },
+    "giraffe": {
+      "type": "image",
+      "url": "giraffe.png",
+      "layout": "auto"
+    },
+    "bliss": {
+      "type": "image",
+      "url": "bliss.jpg",
+      "layout": "auto"
+    },
+    "karaoke": {
+      "type": "sketch",
+      "url": "karaoke-sketch.html",
+      "layout": "horizontal"
+    },
+    "flock": {
+      "type": "sketch",
+      "url": "sample-sketch.html",
+      "layout": "auto"
+    },
+    "fireplace": {
+      "type": "sketch",
+      "url": "video-sketch.html?src=fireplace.mp4",
+      "layout": "auto"
+    },
+    "windows": {
+      "type": "sketch",
+      "url": "bouncing-windows.html",
+      "layout": "auto"
+    }
+  }
+}
