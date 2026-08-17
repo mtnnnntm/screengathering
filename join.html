@@ -855,7 +855,7 @@ function showAdmin() {
     setupCustomUpload();
     new ResizeObserver(sizeOverlay).observe(el.gridPreview);
     el.copyLink.addEventListener('click', () => {
-        const url = "https://mtnnnntm.github.io/screengathering/mosaic.html";
+        const url = "https://mtnnnntm.github.io/screengathering/join.html";
         navigator.clipboard.writeText(url);
         el.copyLink.textContent = 'copied!';
         setTimeout(() => { el.copyLink.textContent = 'share!'; }, 1500);
