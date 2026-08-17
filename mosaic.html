@@ -83,11 +83,12 @@ html, body {
 #status {
     position: absolute;
     bottom: 0; right: 0; left: 0;
-    font-size: 20px;
+    font-size: 40px;
     color: #000;
     background: #FFF;
-    padding: 4px 8px;
+    padding: 8px 16px;
     border-top: 1px solid #000;
+    text-align: center;
     z-index: 100;
     display: none;
 }
@@ -1013,8 +1014,7 @@ function renderMyPiece() {
     currentRenderKey = renderKey;
 
     el.status.classList.add('visible');
-    el.status.textContent =
-        `${isCustom ? 'custom' : activeImageName} · piece ${myIndex + 1} of ${N} · (${row},${col})`;
+    el.status.textContent = `piece ${myIndex + 1} of ${N}`;
 
     if (!isCustom && image.type === 'sketch') {
         hideStage();
