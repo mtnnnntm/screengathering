@@ -48,6 +48,11 @@
       "url": "bouncing-windows.html",
       "layout": "auto",
       "preview": "windows-preview.jpg"
+    },
+    "oma": {
+      "type": "image",
+      "url": "oma.png",
+      "layout": "auto"
     }
   }
 }
