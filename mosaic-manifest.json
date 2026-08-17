@@ -28,22 +28,26 @@
     "karaoke": {
       "type": "sketch",
       "url": "karaoke-sketch.html",
-      "layout": "horizontal"
+      "layout": "horizontal",
+      "preview": "karaoke-preview.jpg"
     },
     "flock": {
       "type": "sketch",
       "url": "sample-sketch.html",
-      "layout": "auto"
+      "layout": "auto",
+      "preview": "flock-preview.jpg"
     },
     "fireplace": {
       "type": "sketch",
       "url": "video-sketch.html?src=fireplace.mp4",
-      "layout": "auto"
+      "layout": "auto",
+      "preview": "fireplace-preview.jpg"
     },
     "windows": {
       "type": "sketch",
       "url": "bouncing-windows.html",
-      "layout": "auto"
+      "layout": "auto",
+      "preview": "windows-preview.jpg"
     }
   }
 }

@@ -11,9 +11,15 @@
 </head>
 <body>
 <script>
+const FIREBASE_CONFIG = {
+    apiKey:      "AIzaSyADqhr0xBlMsgGbm0q0I8cOJfnyIn3rbTg",
+    authDomain:  "screengathering.firebaseapp.com",
+    databaseURL: "https://screengathering-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:   "screengathering",
+};
+
 /* ------------------------------------------------------------------------
-   EDIT THIS BLOCK to change the song.
-   Each line is [timeInSeconds, "lyric"]. Empty strings hide the display.
+   Default lyrics — used when no custom lyrics exist in Firebase.
    ----------------------------------------------------------------- */
 const SONG = {
     lines: [
@@ -23,8 +29,6 @@ const SONG = {
         [10.0, "" ],
     ],
 
-    // null = auto-sync from Unix epoch (all machines agree without any setup).
-    // ISO UTC string ("2026-01-15T20:30:00Z") = specific reference start time.
     startTime: null,
     loop: true,
 };
@@ -52,6 +56,25 @@ const col   = parseInt(params.get('col'))   || 0;
 
 let songDuration;
 let originSec;   // wall-clock reference the song is measured against
+
+// Load custom lyrics from Firebase (async, doesn't block p5.js)
+(async () => {
+    try {
+        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js");
+        const { getDatabase, ref, onValue } = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js");
+        const app = initializeApp(FIREBASE_CONFIG);
+        const db = getDatabase(app);
+        onValue(ref(db, 'mosaic/state/karaokeLyrics'), (snap) => {
+            const data = snap.val();
+            if (data) {
+                SONG.lines = JSON.parse(data);
+                songDuration = SONG.lines[SONG.lines.length - 1][0];
+            }
+        });
+    } catch (e) {
+        console.warn('Firebase init failed in karaoke sketch:', e);
+    }
+})();
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
@@ -119,11 +142,15 @@ function draw() {
 
     // Measure text at a probe size, then scale so it spans ~90% of
     // the virtual canvas width. Cap by height so single-screen still looks good.
+    const fontFamily = '"PingFang TC", "Heiti TC", "STHeiti", "Microsoft JhengHei", "Noto Sans TC", sans-serif';
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    textFont('"PingFang TC", "Heiti TC", "STHeiti", "Microsoft JhengHei", "Noto Sans TC", sans-serif');
-    textSize(100);
-    const probeWidth = textWidth(currentText);
+    textFont(fontFamily);
+
+    // Measure at a fixed probe size using the canvas context directly,
+    // because p5.js may not apply textSize() before textWidth() measures.
+    drawingContext.font = 'bold 100px ' + fontFamily;
+    const probeWidth = drawingContext.measureText(currentText).width;
     const fontSize = Math.min(100 * (W * 0.9) / probeWidth, H * 0.8);
     textSize(fontSize);
 

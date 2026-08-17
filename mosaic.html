@@ -4,14 +4,32 @@
 <meta charset="utf-8">
 <title>join the gathering!</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/@sakun/system.css" />
 <style>
+@font-face {
+  font-family: 'Pixelva';
+  src: url('fonts/Pixelva.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Fix system.css double scrollbar buttons */
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement,
+::-webkit-scrollbar-button:horizontal:start:increment,
+::-webkit-scrollbar-button:horizontal:end:decrement {
+  display: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  background-image: none !important;
+  border: none !important;
+}
 html, body {
     width: 100vw; height: 100vh;
     overflow: hidden;
-    background: #0a0a0a;
-    color: #eee;
-    font-family: -apple-system, ui-monospace, Menlo, monospace;
+    background: #FFF;
+    color: #000;
+    font-family: 'Pixelva', 'Geneva_9', 'Geneva', 'Helvetica', sans-serif;
 }
 
 /* Landing screen shown before joining */
@@ -19,43 +37,35 @@ html, body {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
     justify-content: center; align-items: center;
-    gap: 32px; padding: 48px;
+    gap: 20px; padding: 24px;
     text-align: center;
     z-index: 10;
 }
 #landing.hidden { display: none; }
 #landing h1 {
-    font-size: 42px; font-weight: 300;
-    letter-spacing: 0.15em; text-transform: uppercase;
+    font-size: 28px; font-weight: normal;
 }
 #landing .count {
-    font-size: 15px; opacity: 0.6;
+    font-size: 20px; color: #555;
     min-height: 22px;
-    letter-spacing: 0.05em;
 }
 #landing button {
-    padding: 18px 44px;
-    font-size: 16px; font-weight: 500;
-    background: #fff; color: #000;
-    border: none; border-radius: 4px;
-    cursor: pointer;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: opacity 0.15s;
+    padding: 8px 24px;
+    font-size: 20px;
+    font-family: inherit;
 }
-#landing button:hover { opacity: 0.85; }
-#landing button:disabled { opacity: 0.35; cursor: not-allowed; }
+#landing button:disabled { opacity: 0.4; cursor: not-allowed; }
 #landing .hint {
-    font-size: 12px; opacity: 0.45;
-    max-width: 380px; line-height: 1.6;
-    margin-top: -8px;
+    font-size: 20px; color: #555;
+    max-width: 380px; line-height: 1.5;
+    margin-top: -4px;
 }
 
 /* Rendering surfaces */
 #stage {
     position: absolute; inset: 0;
     background-repeat: no-repeat;
-    background-color: #000;
+    background-color: #FFF;
     display: none;
     z-index: 1;
 }
@@ -72,12 +82,12 @@ html, body {
 /* Status label */
 #status {
     position: absolute;
-    bottom: 14px; right: 14px;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.55);
-    background: rgba(0, 0, 0, 0.55);
-    padding: 3px 7px; border-radius: 2px;
-    letter-spacing: 0.05em;
+    bottom: 0; right: 0; left: 0;
+    font-size: 20px;
+    color: #000;
+    background: #FFF;
+    padding: 4px 8px;
+    border-top: 1px solid #000;
     z-index: 100;
     display: none;
 }
@@ -86,138 +96,178 @@ html, body {
 /* Admin panel */
 #admin {
     position: absolute; inset: 0;
-    padding: 48px;
-    overflow: auto;
+    padding: 12px 16px;
+    overflow: hidden;
     display: none;
     flex-direction: column;
-    gap: 28px;
+    gap: 12px;
     z-index: 5;
 }
 #admin.visible { display: flex; }
-#admin h1 {
-    font-size: 20px; font-weight: 400;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    opacity: 0.5;
+#admin .admin-body {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
 }
-#admin .live {
-    padding: 18px 22px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 6px;
-    display: flex; gap: 20px;
-    align-items: center;
-}
-#admin .live .dot {
-    width: 8px; height: 8px;
-    background: #4ADE80; border-radius: 50%;
-    animation: pulse 2s infinite;
+#admin .controls-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     flex-shrink: 0;
 }
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+#admin .preview-col {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
-#admin-count { font-size: 15px; }
-#admin-active { opacity: 0.55; font-size: 12px; margin-top: 3px; }
+#admin .preview-col > label {
+    font-size: 20px;
+}
+#admin-count { font-size: 20px; }
+#admin-active { font-size: 20px; color: #555; margin-top: 2px; }
 #admin .section-label {
-    opacity: 0.5; font-size: 11px;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    margin-bottom: 8px;
+    font-size: 20px;
+    margin-bottom: 4px;
 }
-#admin .images {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 10px;
+#admin .image-picker {
+    display: flex;
+    gap: 6px;
+    align-items: center;
 }
-#admin .image-btn {
-    padding: 16px 18px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 6px;
-    color: #eee;
-    cursor: pointer;
+.popup-menu-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+.popup-menu {
+    width: 100%;
     text-align: left;
     font-family: inherit;
-    font-size: 14px;
-    transition: all 0.12s;
+    font-size: 20px;
+    padding: 5px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
 }
-#admin .image-btn:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(255,255,255,0.15);
+.popup-menu::after {
+    content: "\25BC";
+    font-size: 10px;
+    margin-left: 8px;
 }
-#admin .image-btn.active {
-    background: #fff; color: #000;
-    border-color: #fff;
+.popup-menu-list {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 2px solid #000;
+    background: #FFF;
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
 }
-#admin .image-btn .type {
-    font-size: 10px; opacity: 0.5;
-    text-transform: uppercase; letter-spacing: 0.12em;
-    margin-top: 5px;
+.popup-menu-list.open { display: block; }
+.popup-item {
+    padding: 3px 8px;
+    font-size: 20px;
+    cursor: default;
+    white-space: nowrap;
+}
+.popup-item:hover {
+    background: #000;
+    color: #FFF;
+}
+.popup-item.selected {
+    font-weight: bold;
 }
 
 /* Grid override controls */
-#admin .grid-controls {
-    display: flex;
-    gap: 20px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-}
 #admin .grid-control-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 #admin .grid-control-group label {
-    font-size: 11px;
-    opacity: 0.5;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-size: 20px;
 }
 #admin .stepper {
     display: flex;
     align-items: center;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 6px;
-    overflow: hidden;
+    width: fit-content;
 }
 #admin .stepper button {
-    width: 40px;
-    height: 40px;
-    background: transparent;
-    border: none;
-    color: #eee;
-    font-size: 18px;
-    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
     font-family: inherit;
-    transition: background 0.12s;
-}
-#admin .stepper button:hover {
-    background: rgba(255,255,255,0.08);
+    padding: 0;
+    margin: 0;
+    min-width: 32px;
 }
 #admin .stepper span {
-    min-width: 48px;
+    min-width: 40px;
     text-align: center;
-    font-size: 15px;
+    font-size: 20px;
     padding: 0 4px;
     font-variant-numeric: tabular-nums;
+    border: 2px inset #888;
+    background: #FFF;
+    height: 32px;
+    line-height: 28px;
 }
 #admin .grid-reset-btn {
-    padding: 10px 18px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 6px;
-    color: #eee;
-    cursor: pointer;
+    padding: 5px 12px;
     font-family: inherit;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: all 0.12s;
-    align-self: flex-end;
+    font-size: 20px;
 }
-#admin .grid-reset-btn:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(255,255,255,0.15);
+#admin .controls-col > .grid-reset-btn,
+#admin .controls-col > div > .grid-reset-btn {
+    width: 100%;
+    box-sizing: border-box;
+}
+#admin .grid-reset-btn.active {
+    background: #000;
+    color: #FFF;
+    border-radius: 4px;
+    overflow: hidden;
+}
+#grid-preview {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    position: relative;
+}
+#grid-preview .grid-overlay {
+    position: absolute;
+    display: grid;
+    background-color: #FFF;
+    background-position: center;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+}
+#grid-preview .grid-cell {
+    border: 1px solid #000;
+}
+
+/* Karaoke editor */
+#karaoke-editor textarea {
+    width: 100%;
+    background: #FFF;
+    border: 2px inset #888;
+    color: #000;
+    font-family: inherit;
+    font-size: 20px;
+    padding: 4px 6px;
+    resize: vertical;
+    margin-bottom: 6px;
+}
+#karaoke-editor textarea:focus {
+    outline: none;
 }
 
 /* Error overlay */
@@ -226,20 +276,20 @@ html, body {
     display: none;
     flex-direction: column;
     justify-content: center; align-items: center;
-    padding: 48px; text-align: center;
-    gap: 14px;
+    padding: 24px; text-align: center;
+    gap: 10px;
     z-index: 20;
 }
 #error.visible { display: flex; }
-#error .title { font-size: 20px; opacity: 0.55; }
-#error .detail { opacity: 0.4; font-size: 13px; max-width: 460px; line-height: 1.5; }
+#error .title { font-size: 24px; }
+#error .detail { color: #555; font-size: 20px; max-width: 460px; line-height: 1.5; }
 </style>
 </head>
 <body>
 
 <div id="landing">
     <p class="count" id="landing-count">connecting…</p>
-    <button id="join-btn" disabled>Join</button>
+    <button id="join-btn" class="btn btn-default" disabled>Join</button>
 </div>
 
 <div id="stage"></div>
@@ -247,39 +297,51 @@ html, body {
 <div id="status"></div>
 
 <div id="admin">
-    <h1>Mosaic · admin</h1>
-    <div class="live">
-        <div class="dot"></div>
-        <div>
-            <div id="admin-count">0 participants</div>
-            <div id="admin-active">no active image</div>
+    <div>
+        <div class="image-picker">
+            <div class="popup-menu-wrap">
+                <button id="image-select-btn" class="btn popup-menu">none</button>
+                <div id="image-select-list" class="popup-menu-list"></div>
+            </div>
+            <button id="upload-btn" class="btn grid-reset-btn">upload</button>
         </div>
+        <input type="file" id="custom-upload-input" accept="image/*" hidden>
     </div>
-    <div>
-        <div class="section-label">Choose what everyone sees</div>
-        <div class="images" id="admin-images"></div>
-    </div>
-    <div>
-        <div class="section-label">Grid override</div>
-        <div class="grid-controls">
+    <div class="admin-body">
+        <div class="controls-col">
             <div class="grid-control-group">
                 <label>Columns</label>
                 <div class="stepper">
-                    <button id="cols-down">&minus;</button>
+                    <button id="cols-down" class="btn">-</button>
                     <span id="cols-value">auto</span>
-                    <button id="cols-up">+</button>
+                    <button id="cols-up" class="btn">+</button>
                 </div>
             </div>
             <div class="grid-control-group">
                 <label>Rows</label>
                 <div class="stepper">
-                    <button id="rows-down">&minus;</button>
+                    <button id="rows-down" class="btn">-</button>
                     <span id="rows-value">auto</span>
-                    <button id="rows-up">+</button>
+                    <button id="rows-up" class="btn">+</button>
                 </div>
             </div>
-            <button id="grid-reset" class="grid-reset-btn">Reset to auto</button>
+            <button id="mode-toggle" class="btn grid-reset-btn">stretch</button>
+            <button id="grid-reset" class="btn grid-reset-btn">Auto Grid</button>
+            <div style="margin-top:auto; display:flex; flex-direction:column; gap:8px;">
+                <div id="admin-count">0 participants</div>
+                <div id="admin-active" style="display:none"></div>
+                <button id="copy-link" class="btn grid-reset-btn">share!</button>
+            </div>
         </div>
+        <div class="preview-col">
+            <label>Preview</label>
+            <div id="grid-preview"></div>
+        </div>
+    </div>
+    <div id="karaoke-editor" style="display:none">
+        <div class="section-label">lyrics</div>
+        <textarea id="lyrics-input" rows="6" placeholder="one line per row"></textarea>
+        <button id="lyrics-save" class="btn grid-reset-btn">save lyrics</button>
     </div>
 </div>
 
@@ -303,12 +365,155 @@ const FIREBASE_CONFIG = {
     projectId:   "screengathering",
 };
 
+const CACHE_BUST = Date.now();
+
 // ==================================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
     getDatabase, ref, push, set, onValue, onDisconnect,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+
+// ==================================================================
+// Dithering — Mac 256-color Atkinson (from src/dither.js)
+// ==================================================================
+
+function generateMac256() {
+    const p = [];
+    for (let r = 5; r >= 0; r--)
+        for (let g = 5; g >= 0; g--)
+            for (let b = 5; b >= 0; b--)
+                p.push([r * 51, g * 51, b * 51]);
+    for (let i = 14; i >= 1; i--) { const v = i * 17; if (v % 51 !== 0) p.push([v, 0, 0]); }
+    for (let i = 14; i >= 1; i--) { const v = i * 17; if (v % 51 !== 0) p.push([0, v, 0]); }
+    for (let i = 14; i >= 1; i--) { const v = i * 17; if (v % 51 !== 0) p.push([0, 0, v]); }
+    for (let i = 14; i >= 1; i--) { const v = i * 17; if (v % 51 !== 0) p.push([v, v, v]); }
+    while (p.length < 256) p.push([0, 0, 0]);
+    return p.slice(0, 256);
+}
+const MAC_256 = generateMac256();
+
+function nearestColor(r, g, b, palette) {
+    let best = 0, bestDist = Infinity;
+    for (let i = 0; i < palette.length; i++) {
+        const dr = r - palette[i][0], dg = g - palette[i][1], db = b - palette[i][2];
+        const dist = dr*dr + dg*dg + db*db;
+        if (dist < bestDist) { bestDist = dist; best = i; }
+    }
+    return palette[best];
+}
+
+function buildColorLUT(palette) {
+    const SIZE = 32;
+    const lut = new Uint8Array(SIZE * SIZE * SIZE * 3);
+    for (let ri = 0; ri < SIZE; ri++)
+        for (let gi = 0; gi < SIZE; gi++)
+            for (let bi = 0; bi < SIZE; bi++) {
+                const r = Math.round(ri * 255 / 31);
+                const g = Math.round(gi * 255 / 31);
+                const b = Math.round(bi * 255 / 31);
+                const [nr, ng, nb] = nearestColor(r, g, b, palette);
+                const idx = (ri * SIZE * SIZE + gi * SIZE + bi) * 3;
+                lut[idx] = nr; lut[idx+1] = ng; lut[idx+2] = nb;
+            }
+    return lut;
+}
+const MAC_256_LUT = buildColorLUT(MAC_256);
+
+function atkinsonColor(imageData) {
+    const w = imageData.width, h = imageData.height;
+    const lut = MAC_256_LUT;
+    const dr = new Float32Array(w * h);
+    const dg = new Float32Array(w * h);
+    const db = new Float32Array(w * h);
+    for (let i = 0; i < w * h; i++) {
+        dr[i] = imageData.data[i*4];
+        dg[i] = imageData.data[i*4+1];
+        db[i] = imageData.data[i*4+2];
+    }
+    for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+            const i = y * w + x;
+            const or_ = dr[i], og = dg[i], ob = db[i];
+            const ri = Math.max(0, Math.min(255, Math.round(or_))) >> 3;
+            const gi = Math.max(0, Math.min(255, Math.round(og))) >> 3;
+            const bi = Math.max(0, Math.min(255, Math.round(ob))) >> 3;
+            const li = (ri * 1024 + gi * 32 + bi) * 3;
+            const nr = lut[li], ng = lut[li+1], nb = lut[li+2];
+            const er = (or_ - nr) / 8, eg = (og - ng) / 8, eb = (ob - nb) / 8;
+            dr[i] = nr; dg[i] = ng; db[i] = nb;
+            const offsets = [
+                [x+1,y],[x+2,y],[x-1,y+1],[x,y+1],[x+1,y+1],[x,y+2]
+            ];
+            for (const [nx, ny] of offsets) {
+                if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+                    const ni = ny * w + nx;
+                    dr[ni] += er; dg[ni] += eg; db[ni] += eb;
+                }
+            }
+        }
+    }
+    const out = new ImageData(w, h);
+    for (let i = 0; i < w * h; i++) {
+        out.data[i*4] = Math.max(0, Math.min(255, Math.round(dr[i])));
+        out.data[i*4+1] = Math.max(0, Math.min(255, Math.round(dg[i])));
+        out.data[i*4+2] = Math.max(0, Math.min(255, Math.round(db[i])));
+        out.data[i*4+3] = 255;
+    }
+    return out;
+}
+
+const GAMMA_LUT = new Uint8Array(256);
+{
+    const gamma = 2.2 / 1.8;
+    for (let i = 0; i < 256; i++)
+        GAMMA_LUT[i] = Math.round(Math.pow(i / 255, gamma) * 255);
+}
+
+function applyMacGamma(imageData) {
+    const out = new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height);
+    for (let i = 0; i < out.data.length; i += 4) {
+        out.data[i] = GAMMA_LUT[out.data[i]];
+        out.data[i+1] = GAMMA_LUT[out.data[i+1]];
+        out.data[i+2] = GAMMA_LUT[out.data[i+2]];
+    }
+    return out;
+}
+
+const DITHER_MAX_W = 400;
+const ditherCache = {};
+
+function ditherImageUrl(url) {
+    if (ditherCache[url]) return Promise.resolve(ditherCache[url]);
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const scale = Math.min(1, DITHER_MAX_W / img.width);
+            const w = Math.round(img.width * scale);
+            const h = Math.round(img.height * scale);
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            let imgData = ctx.getImageData(0, 0, w, h);
+            imgData = applyMacGamma(imgData);
+            const result = atkinsonColor(imgData);
+            const out = document.createElement('canvas');
+            out.width = w;
+            out.height = h;
+            out.getContext('2d').putImageData(result, 0, 0);
+            const dataUrl = out.toDataURL();
+            ditherCache[url] = dataUrl;
+            resolve(dataUrl);
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = url;
+    });
+}
+
+// ==================================================================
 
 // URL params — ?admin=1 shows admin panel instead of participant flow.
 const urlParams = new URLSearchParams(window.location.search);
@@ -326,7 +531,14 @@ const el = {
     admin:        $('admin'),
     adminCount:   $('admin-count'),
     adminActive:  $('admin-active'),
-    adminImages:  $('admin-images'),
+    imageSelectBtn:  $('image-select-btn'),
+    imageSelectList: $('image-select-list'),
+    uploadBtn:    $('upload-btn'),
+    copyLink:     $('copy-link'),
+    karaokeEditor: $('karaoke-editor'),
+    lyricsInput:  $('lyrics-input'),
+    lyricsSave:   $('lyrics-save'),
+    customUploadInput: $('custom-upload-input'),
     colsValue:    $('cols-value'),
     colsUp:       $('cols-up'),
     colsDown:     $('cols-down'),
@@ -334,6 +546,8 @@ const el = {
     rowsUp:       $('rows-up'),
     rowsDown:     $('rows-down'),
     gridReset:    $('grid-reset'),
+    modeToggle:   $('mode-toggle'),
+    gridPreview:  $('grid-preview'),
     error:        $('error'),
     errorDetail:  $('error-detail'),
 };
@@ -349,6 +563,27 @@ let hasJoined = false;
 let currentRenderKey = '';
 let firebaseConnected = false;
 let gridOverride = null;
+let customImageData = null;
+let imageMode = 'stretch';
+let currentOverlay = null;
+let currentCols = 1;
+let currentRows = 1;
+
+function sizeOverlay() {
+    if (!currentOverlay) return;
+    const pw = el.gridPreview.clientWidth;
+    const ph = el.gridPreview.clientHeight;
+    if (!pw || !ph) return;
+    const gridAR = (currentCols * 16) / (currentRows * 9);
+    const containerAR = pw / ph;
+    let w, h;
+    if (gridAR > containerAR) { w = pw; h = pw / gridAR; }
+    else { h = ph; w = ph * gridAR; }
+    currentOverlay.style.width = Math.floor(w) + 'px';
+    currentOverlay.style.height = Math.floor(h) + 'px';
+    currentOverlay.style.left = '0';
+    currentOverlay.style.top = '0';
+}
 
 // ==================================================================
 // Init
@@ -396,6 +631,24 @@ async function init() {
     onValue(ref(db, 'mosaic/state/gridOverride'), (snap) => {
         gridOverride = snap.val();
         onStateChange();
+    });
+    onValue(ref(db, 'mosaic/state/customImageData'), (snap) => {
+        customImageData = snap.val();
+        onStateChange();
+    });
+    onValue(ref(db, 'mosaic/state/imageMode'), (snap) => {
+        imageMode = snap.val() || 'stretch';
+        onStateChange();
+    });
+    onValue(ref(db, 'mosaic/state/karaokeLyrics'), (snap) => {
+        const data = snap.val();
+        if (isAdmin && data && el.lyricsInput) {
+            // Populate textarea from stored lyrics (skip empty bookend lines)
+            const lines = JSON.parse(data)
+                .map(l => l[1])
+                .filter(t => t.length > 0);
+            el.lyricsInput.value = lines.join('\n');
+        }
     });
 
     if (isAdmin) {
@@ -463,11 +716,15 @@ function onStateChange() {
     if (isAdmin) {
         el.adminCount.textContent = `${N} participant${N === 1 ? '' : 's'}`;
         el.adminActive.textContent = activeImageName
-            ? `active: ${activeImageName}`
+            ? `active: ${activeImageName === '__custom__' ? 'custom upload' : activeImageName}`
             : 'no active image';
         renderAdminButtons();
         el.colsValue.textContent = gridOverride?.cols ? gridOverride.cols : 'auto';
         el.rowsValue.textContent = gridOverride?.rows ? gridOverride.rows : 'auto';
+        renderGridPreview();
+        el.modeToggle.classList.toggle('active', imageMode === 'stretch');
+        el.gridReset.classList.toggle('active', !gridOverride);
+        el.karaokeEditor.style.display = activeImageName === 'karaoke' ? '' : 'none';
     }
 
     // Rendered piece.
@@ -476,41 +733,186 @@ function onStateChange() {
     }
 }
 
+let popupValue = '';
+
+function selectPopupItem(val) {
+    popupValue = val;
+    el.imageSelectBtn.textContent = val || 'none';
+    el.imageSelectList.classList.remove('open');
+    set(ref(db, 'mosaic/state/activeImage'), val || null);
+    if (!val) set(ref(db, 'mosaic/state/customImageData'), null);
+}
+
+function rebuildPopupList() {
+    el.imageSelectList.innerHTML = '';
+    const items = [{ value: '', label: 'none' }];
+    if (manifest?.images) {
+        for (const name of Object.keys(manifest.images)) {
+            items.push({ value: name, label: name });
+        }
+    }
+    if (activeImageName === '__custom__') {
+        items.push({ value: '__custom__', label: 'custom' });
+    }
+    for (const item of items) {
+        const div = document.createElement('div');
+        div.className = 'popup-item' + (item.value === popupValue ? ' selected' : '');
+        div.textContent = item.label;
+        div.addEventListener('click', () => selectPopupItem(item.value));
+        el.imageSelectList.appendChild(div);
+    }
+}
+
+// Toggle popup on button click
+el.imageSelectBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    rebuildPopupList();
+    el.imageSelectList.classList.toggle('open');
+});
+
+// Close popup on outside click
+document.addEventListener('click', () => {
+    el.imageSelectList.classList.remove('open');
+});
+
 function renderAdminButtons() {
-    el.adminImages.innerHTML = '';
     if (!manifest?.images) return;
 
-    for (const [name, entry] of Object.entries(manifest.images)) {
-        const btn = document.createElement('button');
-        btn.className = 'image-btn';
-        if (name === activeImageName) btn.classList.add('active');
-        btn.innerHTML = `
-            <div>${name}</div>
-            <div class="type">${entry.type} · ${entry.layout || 'auto'}</div>
-        `;
-        btn.addEventListener('click', () => {
-            set(ref(db, 'mosaic/state/activeImage'), name);
-        });
-        el.adminImages.appendChild(btn);
+    // Sync selected value
+    popupValue = activeImageName || '';
+    el.imageSelectBtn.textContent = popupValue || 'none';
+}
+
+function renderGridPreview() {
+    const N = Object.keys(participants).length;
+    const isCustom = activeImageName === '__custom__';
+    const image = (!isCustom && manifest?.images?.[activeImageName]) || null;
+    const mode = isCustom ? 'auto' : (image?.layout || 'auto');
+
+    let cols, rows;
+    if (gridOverride?.cols && gridOverride?.rows) {
+        cols = gridOverride.cols;
+        rows = gridOverride.rows;
+    } else {
+        const auto = computeLayout(Math.max(1, N), mode);
+        cols = auto.cols;
+        rows = auto.rows;
     }
 
-    const clearBtn = document.createElement('button');
-    clearBtn.className = 'image-btn';
-    if (!activeImageName) clearBtn.classList.add('active');
-    clearBtn.innerHTML = `
-        <div>none</div>
-        <div class="type">clear active image</div>
-    `;
-    clearBtn.addEventListener('click', () => {
-        set(ref(db, 'mosaic/state/activeImage'), null);
-    });
-    el.adminImages.appendChild(clearBtn);
+    // Determine source image URL
+    let srcUrl = null;
+    if (isCustom && customImageData) {
+        srcUrl = customImageData;
+    } else if (image?.preview) {
+        srcUrl = image.preview;
+    } else if (image?.url && image.type !== 'sketch') {
+        srcUrl = image.url;
+    }
+
+    // Build grid overlay
+    el.gridPreview.innerHTML = '';
+    const overlay = document.createElement('div');
+    overlay.className = 'grid-overlay';
+    overlay.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    overlay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+    // Dither and set background on overlay
+    if (srcUrl) {
+        if (ditherCache[srcUrl]) {
+            overlay.style.backgroundImage = `url('${ditherCache[srcUrl]}')`;
+        } else {
+            overlay.style.backgroundImage = 'none';
+            ditherImageUrl(srcUrl).then(dithered => {
+                if (currentOverlay === overlay) {
+                    overlay.style.backgroundImage = `url('${dithered}')`;
+                }
+            }).catch(() => {});
+        }
+    } else {
+        overlay.style.backgroundImage = 'none';
+    }
+    overlay.style.backgroundSize = imageMode === 'cover' ? 'cover' : '100% 100%';
+
+    const totalCells = cols * rows;
+    for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        overlay.appendChild(cell);
+    }
+
+    el.gridPreview.appendChild(overlay);
+    currentOverlay = overlay;
+    currentCols = cols;
+    currentRows = rows;
+    sizeOverlay();
 }
 
 function showAdmin() {
     el.landing.classList.add('hidden');
     el.admin.classList.add('visible');
     setupGridControls();
+    setupCustomUpload();
+    new ResizeObserver(sizeOverlay).observe(el.gridPreview);
+    el.copyLink.addEventListener('click', () => {
+        const url = window.location.origin + window.location.pathname;
+        navigator.clipboard.writeText(url);
+        el.copyLink.textContent = 'copied!';
+        setTimeout(() => { el.copyLink.textContent = 'share!'; }, 1500);
+    });
+    el.lyricsSave.addEventListener('click', () => {
+        const text = el.lyricsInput.value.trim();
+        const lines = text.split('\n').filter(l => l.length > 0);
+        const secPerLine = 4;
+        const lyricsArray = [[0, '']];
+        lines.forEach((line, i) => {
+            lyricsArray.push([(i + 1) * secPerLine, line]);
+        });
+        lyricsArray.push([(lines.length + 1) * secPerLine, '']);
+        set(ref(db, 'mosaic/state/karaokeLyrics'), JSON.stringify(lyricsArray));
+        el.lyricsSave.textContent = 'saved!';
+        setTimeout(() => { el.lyricsSave.textContent = 'save lyrics'; }, 1500);
+    });
+}
+
+function resizeImageToDataURL(file, maxDimension, quality) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            let { width, height } = img;
+            if (width > maxDimension || height > maxDimension) {
+                if (width > height) {
+                    height = Math.round(height * (maxDimension / width));
+                    width = maxDimension;
+                } else {
+                    width = Math.round(width * (maxDimension / height));
+                    height = maxDimension;
+                }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = () => reject(new Error('Failed to load image'));
+        img.src = URL.createObjectURL(file);
+    });
+}
+
+function setupCustomUpload() {
+    el.uploadBtn.addEventListener('click', () => {
+        el.customUploadInput.click();
+    });
+    el.customUploadInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        e.target.value = '';
+
+        const dataUrl = await resizeImageToDataURL(file, 1920, 0.75);
+        await set(ref(db, 'mosaic/state/customImageData'), dataUrl);
+        await set(ref(db, 'mosaic/state/activeImage'), '__custom__');
+    });
 }
 
 function setupGridControls() {
@@ -547,11 +949,28 @@ function setupGridControls() {
     el.gridReset.addEventListener('click', () => {
         set(ref(db, 'mosaic/state/gridOverride'), null);
     });
+    el.modeToggle.addEventListener('click', () => {
+        set(ref(db, 'mosaic/state/imageMode'), imageMode === 'stretch' ? 'cover' : 'stretch');
+    });
 }
 
 // ==================================================================
 // Piece rendering
 // ==================================================================
+
+const imageDimCache = {};
+function getImageDimensions(url) {
+    if (imageDimCache[url]) return Promise.resolve(imageDimCache[url]);
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            imageDimCache[url] = { w: img.naturalWidth, h: img.naturalHeight };
+            resolve(imageDimCache[url]);
+        };
+        img.onerror = () => resolve(null);
+        img.src = url;
+    });
+}
 
 function computeLayout(N, mode) {
     if (gridOverride && gridOverride.cols && gridOverride.rows) {
@@ -574,42 +993,70 @@ function renderMyPiece() {
     if (myIndex < 0) return;
 
     // No active image → gentle waiting screen.
-    if (!activeImageName || !manifest?.images?.[activeImageName]) {
+    const isCustom = activeImageName === '__custom__';
+    if (!activeImageName || (!isCustom && !manifest?.images?.[activeImageName])) {
         hideStage(); hideSketch();
         el.status.classList.add('visible');
         el.status.textContent = `waiting for active image · you are ${myIndex + 1} of ${N}`;
         return;
     }
 
-    const image = manifest.images[activeImageName];
-    const { cols, rows } = computeLayout(N, image.layout || 'auto');
+    const image = isCustom ? null : manifest.images[activeImageName];
+    const imageLayout = isCustom ? 'auto' : (image.layout || 'auto');
+    const { cols, rows } = computeLayout(N, imageLayout);
     const row = Math.floor(myIndex / cols);
     const col = myIndex % cols;
 
     // Dedup — avoid unnecessary DOM churn on every state change.
-    const renderKey = `${activeImageName}|${image.url}|${myIndex}|${cols}x${rows}`;
+    const renderKey = `${activeImageName}|${isCustom ? (customImageData?.length || 0) : image.url}|${myIndex}|${cols}x${rows}|${imageMode}`;
     if (renderKey === currentRenderKey) return;
     currentRenderKey = renderKey;
 
     el.status.classList.add('visible');
     el.status.textContent =
-        `${activeImageName} · piece ${myIndex + 1} of ${N} · (${row},${col})`;
+        `${isCustom ? 'custom' : activeImageName} · piece ${myIndex + 1} of ${N} · (${row},${col})`;
 
-    if (image.type === 'sketch') {
+    if (!isCustom && image.type === 'sketch') {
         hideStage();
         const qs = image.url.includes('?') ? '&' : '?';
         const sketchURL = image.url + qs
-            + `piece=${myIndex}&rows=${rows}&cols=${cols}&row=${row}&col=${col}`;
+            + `piece=${myIndex}&rows=${rows}&cols=${cols}&row=${row}&col=${col}&_v=${CACHE_BUST}`;
         if (el.sketch.src !== sketchURL) el.sketch.src = sketchURL;
         el.sketch.classList.add('visible');
     } else {
         hideSketch();
-        el.stage.style.backgroundImage = `url('${image.url}')`;
-        el.stage.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
-        const px = cols > 1 ? (col / (cols - 1)) * 100 : 0;
-        const py = rows > 1 ? (row / (rows - 1)) * 100 : 0;
-        el.stage.style.backgroundPosition = `${px}% ${py}%`;
-        el.stage.classList.add('visible');
+        const imageUrl = isCustom ? customImageData : image.url;
+        if (!imageUrl) {
+            el.status.classList.add('visible');
+            el.status.textContent = 'loading custom image…';
+            return;
+        }
+        el.stage.style.backgroundImage = `url('${imageUrl}')`;
+
+        if (imageMode === 'cover') {
+            getImageDimensions(imageUrl).then(dims => {
+                if (!dims) return;
+                const screenW = window.innerWidth;
+                const screenH = window.innerHeight;
+                const gridW = cols * screenW;
+                const gridH = rows * screenH;
+                const scale = Math.max(gridW / dims.w, gridH / dims.h);
+                const bgW = dims.w * scale;
+                const bgH = dims.h * scale;
+                const offsetX = (bgW - gridW) / 2;
+                const offsetY = (bgH - gridH) / 2;
+                el.stage.style.backgroundSize = `${bgW}px ${bgH}px`;
+                el.stage.style.backgroundPosition =
+                    `${-(offsetX + col * screenW)}px ${-(offsetY + row * screenH)}px`;
+                el.stage.classList.add('visible');
+            });
+        } else {
+            el.stage.style.backgroundSize = `${cols * 100}% ${rows * 100}%`;
+            const px = cols > 1 ? (col / (cols - 1)) * 100 : 0;
+            const py = rows > 1 ? (row / (rows - 1)) * 100 : 0;
+            el.stage.style.backgroundPosition = `${px}% ${py}%`;
+            el.stage.classList.add('visible');
+        }
     }
 }
 
